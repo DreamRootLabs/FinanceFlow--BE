@@ -1,0 +1,7 @@
+#visual env
+.venv/
+__pycache__/
+
+
+#env
+.env

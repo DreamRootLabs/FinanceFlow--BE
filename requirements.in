@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+google-cloud-firestore
+python-dotenv
+pydantic
+pip-tools
+python-jose
+itsdangerous
+python-dateutil
+tzdata
+fpdf2
