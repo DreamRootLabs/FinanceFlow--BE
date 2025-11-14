@@ -9,3 +9,5 @@ itsdangerous
 python-dateutil
 tzdata
 fpdf2
+loguru
+firebase-admin
