@@ -11,3 +11,5 @@ tzdata
 fpdf2
 loguru
 firebase-admin
+PyJWT
+python-dotenv

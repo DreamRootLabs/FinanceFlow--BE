@@ -150,7 +150,9 @@ pydantic==2.12.4
 pydantic-core==2.41.5
     # via pydantic
 pyjwt[crypto]==2.10.1
-    # via firebase-admin
+    # via
+    #   -r requirements.in
+    #   firebase-admin
 pyproject-hooks==1.2.0
     # via
     #   build

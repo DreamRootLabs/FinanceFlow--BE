@@ -7,6 +7,9 @@ from pathlib import Path
 import firebase_admin
 from firebase_admin import credentials, firestore
 from loguru import logger
+from dotenv import load_dotenv
+
+load_dotenv()
 
 ENV_PROJECT_ID = "FIREBASE_PROJECT_ID"
 ENV_CRED_FILE = "FIREBASE_CREDENTIALS_FILE"      
@@ -41,32 +44,21 @@ def _build_credentials() -> credentials.Certificate:
 
 @lru_cache(maxsize=1)
 def get_firestore() -> firestore.Client:
-    """
-    Lazily initialize and return a shared Firestore client.
-
-    Priority:
-    - If FIREBASE_CREDENTIALS_BASE64 or FIREBASE_CREDENTIALS_FILE is set:
-        use explicit Firebase credentials.
-    - Otherwise:
-        rely on default GCP credentials (Cloud Run / GCE service account).
-    """
     project_id = os.getenv(ENV_PROJECT_ID)
+    logger.info("DEBUG FIREBASE_PROJECT_ID seen by process: {}", project_id)
     if not project_id:
         raise RuntimeError(f"{ENV_PROJECT_ID} is not set")
 
     try:
         try:
-            # Reuse existing app if initialized
             app = firebase_admin.get_app()
             logger.debug("Reusing existing Firebase app: {}", app.name)
         except ValueError:
-            # Not initialized yet → choose credentials strategy
             if os.getenv(ENV_CRED_B64) or os.getenv(ENV_CRED_FILE):
                 cred = _build_credentials()
                 logger.info("Initializing Firebase app with explicit credentials")
                 firebase_admin.initialize_app(cred, {"projectId": project_id})
             else:
-                # Cloud Run / GCP mode: use default application credentials
                 logger.info(
                     "Initializing Firebase app with default application credentials "
                     "(no {} or {} set)", ENV_CRED_FILE, ENV_CRED_B64
@@ -77,3 +69,7 @@ def get_firestore() -> firestore.Client:
     except Exception as e:
         logger.exception("Failed to initialize Firestore")
         raise RuntimeError(f"Failed to initialize Firestore: {e}")
+    
+def get_db() -> firestore.Client:
+    # Always use the cached initializer
+    return get_firestore()
