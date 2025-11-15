@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from typing import List
+from typing import List, Dict, Any, Optional
+
+from google.cloud import firestore
 
 from db.db_connector import get_firestore
 from src.models.transaction import TransactionCreate, TransactionInDB
@@ -63,3 +65,35 @@ class TransactionRepo:
             updated_at=now,
             **payload.model_dump(),
         )
+    
+    def list_for_owner_between(
+        self,
+        owner_id: str,
+        start: datetime,
+        end: datetime,
+    ) -> List[Dict[str, Any]]:
+        """
+        Return all transactions for an owner where transaction_date is between [start, end).
+        Assumes you store a timestamp field like 'transaction_date' or 'date'.
+        """
+        # 🔧 IMPORTANT: if your field is called something else (e.g. "date" or "occurred_at"),
+        # change "transaction_date" below to match.
+        field_name = "occurred_at"
+
+        query = (
+            self._collection()
+            .where("owner_id", "==", owner_id)
+            .where(field_name, ">=", start)
+            .where(field_name, "<", end)
+            .order_by(field_name)
+        )
+
+        docs = query.stream()
+        results: List[Dict[str, Any]] = []
+        
+        for doc in docs:
+            data = doc.to_dict() or {}
+            data["id"] = doc.id
+            results.append(data)
+
+        return results
