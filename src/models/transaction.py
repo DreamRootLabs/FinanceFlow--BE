@@ -9,7 +9,7 @@ TransactionType = Literal["expense", "income"]
 class TransactionBase(BaseModel):
     amount: float = Field(..., gt=0)
     type: TransactionType
-    category_id: str = Field(..., min_length=1)
+    category_id: Optional[str] = None
     description: Optional[str] = None
     occurred_at: datetime
 

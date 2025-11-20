@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Any
-
 from fastapi import APIRouter, Depends, Request, Response, status
 
 from src.core.auth_dependency import get_current_owner_id
@@ -25,37 +23,37 @@ def get_category_service() -> CategoryService:
 
 def _list_categories(
     request: Request,
-    _owner_id: str = Depends(get_current_owner_id),  # enforces auth
+    owner_id: str = Depends(get_current_owner_id),
     service: CategoryService = Depends(get_category_service),
 ) -> CategoriesListResponse:
     """
-    Return all categories for the current owner.
+    Return system categories + user categories for the current owner.
     """
-    return service.list_categories()
+    return service.list_categories(owner_id)
 
 
 def _create_category(
     request: Request,
     payload: CategoryCreate,
-    _owner_id: str = Depends(get_current_owner_id),  # enforces auth
+    owner_id: str = Depends(get_current_owner_id),
     service: CategoryService = Depends(get_category_service),
 ) -> CategoryResponse:
     """
-    Create a new category for the current owner.
+    Create a new user-owned category.
     """
-    return service.create_category(payload)
+    return service.create_category(owner_id, payload)
 
 
 def _delete_category(
     request: Request,
     category_id: str,
-    _owner_id: str = Depends(get_current_owner_id),  # enforces auth
+    owner_id: str = Depends(get_current_owner_id),
     service: CategoryService = Depends(get_category_service),
 ) -> Response:
     """
-    Delete a category by id for the current owner.
+    Delete a user-owned category (system categories are protected).
     """
-    service.delete_category(category_id)
+    service.delete_category(owner_id, category_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 

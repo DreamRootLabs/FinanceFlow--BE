@@ -9,12 +9,16 @@ from src.models.category import (
 )
 from src.repos.category_repo import CategoryRepo
 
+
 class CategoryService:
     def __init__(self, repo: CategoryRepo | None = None):
         self.repo = repo or CategoryRepo()
 
-    def list_categories(self) -> CategoriesListResponse:
-        items_in_db = self.repo.list()
+    # --------------------------------------------
+    # LIST: user categories + system categories
+    # --------------------------------------------
+    def list_categories(self, owner_id: str) -> CategoriesListResponse:
+        items_in_db = self.repo.list_for_owner(owner_id)
         items = [
             CategoryResponse(
                 id=item.id,
@@ -27,8 +31,11 @@ class CategoryService:
         ]
         return CategoriesListResponse(items=items)
 
-    def create_category(self, payload: CategoryCreate) -> CategoryResponse:
-        created = self.repo.create(payload)
+    # --------------------------------------------
+    # CREATE: user-owned category only
+    # --------------------------------------------
+    def create_category(self, owner_id: str, payload: CategoryCreate) -> CategoryResponse:
+        created = self.repo.create_for_owner(owner_id, payload)
         return CategoryResponse(
             id=created.id,
             name=created.name,
@@ -37,10 +44,13 @@ class CategoryService:
             is_system=created.is_system,
         )
 
-    def delete_category(self, category_id: str) -> None:
-        ok = self.repo.delete(category_id)
+    # --------------------------------------------
+    # DELETE: only user-owned categories
+    # --------------------------------------------
+    def delete_category(self, owner_id: str, category_id: str) -> None:
+        ok = self.repo.delete_for_owner(owner_id, category_id)
         if not ok:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Category not found",
+                detail="Category not found or cannot be deleted",
             )

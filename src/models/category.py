@@ -12,17 +12,20 @@ class CategoryBase(BaseModel):
     color: Optional[str] = Field(default=None)
 
 class CategoryCreate(CategoryBase):
-    is_system: bool = True  # global/system category by default
+    is_system: bool = False # global/system category by default
+    owner_id: Optional[str] = None
 
 class CategoryInDB(CategoryBase):
     id: str
     is_system: bool
+    owner_id: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 
 class CategoryResponse(CategoryBase):
     id: str
     is_system: bool
+    owner_id: Optional[str] = None
 
 class CategoriesListResponse(BaseModel):
     items: list[CategoryResponse]
