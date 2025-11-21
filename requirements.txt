@@ -13,6 +13,8 @@ anyio==4.11.0
     #   httpx
     #   starlette
     #   watchfiles
+bcrypt==5.0.0
+    # via passlib
 build==1.3.0
     # via pip-tools
 cachecontrol==0.14.4
@@ -42,8 +44,12 @@ cryptography==46.0.3
     # via pyjwt
 defusedxml==0.7.1
     # via fpdf2
+dnspython==2.8.0
+    # via email-validator
 ecdsa==0.19.1
     # via python-jose
+email-validator==2.3.0
+    # via -r requirements.in
 fastapi==0.121.2
     # via -r requirements.in
 firebase-admin==7.1.0
@@ -109,6 +115,7 @@ hyperframe==6.1.0
 idna==3.11
     # via
     #   anyio
+    #   email-validator
     #   httpx
     #   requests
 itsdangerous==2.2.0
@@ -119,6 +126,8 @@ msgpack==1.1.2
     # via cachecontrol
 packaging==25.0
     # via build
+passlib[bcrypt]==1.7.4
+    # via -r requirements.in
 pillow==12.0.0
     # via fpdf2
 pip-tools==7.5.2
